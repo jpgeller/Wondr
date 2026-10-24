@@ -3,6 +3,7 @@ import path from 'node:path';
 import { runAgent } from 'wondr-agent/run-agent';
 import { executeTool } from 'wondr-agent/tools';
 import { appendProgress, getPlanRow, markFailed, saveResult } from './db';
+import { createPlaceholderEvents } from '../calendar';
 import { PlanInputSchema, planFromTool } from './omnara-plan';
 import type { Plan, PlanInput } from '../types';
 
@@ -58,6 +59,12 @@ export async function runOmnaraPlan(planId: string): Promise<void> {
       progress: (message, step) => appendProgress(planId, message, step),
       save: (plan) => saveResult(planId, plan, 'planning'),
     });
+    // Calendar placeholders need the saved result. A calendar error never fails the plan.
+    await saveResult(planId, plan, 'planning');
+    await appendProgress(planId, 'Adding your mystery stops to your calendar', 'calendar');
+    await createPlaceholderEvents(planId).catch((err) =>
+      console.error('[calendar] placeholders failed', { planId, message: err instanceof Error ? err.message : err }),
+    );
     await saveResult(planId, plan, 'ready');
     await appendProgress(planId, 'Your plan is ready', 'plan_ready');
   } catch (error) {
