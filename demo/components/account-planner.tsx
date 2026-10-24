@@ -7,18 +7,21 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { exampleProfile } from '@/lib/agent/example-profile';
 import type { PlanInput, PlanRow } from '@/lib/types';
 import PlannerView from './planner-view';
+import MysteryReady from './mystery-ready';
+import { preferencesToInput, PreferencesSchema } from '@/lib/preferences';
 
-export default function AccountPlanner({ initialName, calendarConnected }: { initialName?: string; calendarConnected?: boolean }) {
+export default function AccountPlanner({ initialName, calendarConnected, startReady = false }: { initialName?: string; calendarConnected?: boolean; startReady?: boolean }) {
   const [client, setClient] = useState<SupabaseClient | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(false);
-  const [profile, setProfile] = useState(() => ({ ...exampleProfile(), vibe: 'Going alone. A relaxed outing with time to travel between stops.' }));
+  const [profile, setProfile] = useState<PlanInput>(() => ({ ...exampleProfile(), vibe: 'Going alone. A relaxed outing with time to travel between stops.' }));
+  const [showReady, setShowReady] = useState(startReady);
   const [planId, setPlanId] = useState<string | null>(null);
   const [plan, setPlan] = useState<PlanRow | null>(null);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState('');
   const running = starting || (plan?.status === 'planning' && !error);
-  const name = initialName || session?.user.user_metadata?.full_name || session?.user.email || 'You';
+  const name = profile.organizer?.name || initialName || session?.user.user_metadata?.full_name || session?.user.email || 'You';
 
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -30,12 +33,12 @@ export default function AccountPlanner({ initialName, calendarConnected }: { ini
       setSession(data.session);
       if (error) setError(error.message);
       if (data.session) {
-        const { data: saved } = await supabase.from('profiles').select('city, interests, default_window_start, default_window_end').eq('user_id', data.session.user.id).maybeSingle();
-        if (saved) setProfile((base) => ({
-          ...base, city: saved.city || base.city, interests: saved.interests?.length ? saved.interests : base.interests,
-          windowStart: saved.default_window_start?.slice(0, 5) || base.windowStart,
-          windowEnd: saved.default_window_end?.slice(0, 5) || base.windowEnd,
-        }));
+        try {
+          const response = await fetch('/api/preferences');
+          const saved = await response.json();
+          const parsed = PreferencesSchema.safeParse(saved.preferences);
+          if (response.ok && parsed.success) setProfile(preferencesToInput(parsed.data, data.session.user.email!));
+        } catch { setError('Could not load your saved taste. Reload to try again.'); }
       }
       setAuthReady(true);
     });
@@ -89,7 +92,13 @@ export default function AccountPlanner({ initialName, calendarConnected }: { ini
     } finally { setStarting(false); }
   }
 
-  return <PlannerView key={authReady ? 'ready' : 'loading'} profile={profile} resultProfile={plan?.input} onGenerate={generate}
+  if (showReady) return <MysteryReady plan={plan?.status === 'ready' ? plan.result : null} profile={plan?.input || profile}
+    progress={plan?.progress.at(-1)?.message} error={error || (plan?.status === 'failed' ? plan.error || 'Could not finish your day.' : '')}
+    onBack={() => { window.location.href = '/preferences'; }} onStart={() => {
+      const url = new URL(window.location.href); url.searchParams.delete('ready'); window.history.replaceState(null, '', url); setShowReady(false);
+    }} />;
+
+  return <PlannerView key={authReady ? plan?.id || 'ready' : 'loading'} profile={plan?.input || profile} resultProfile={plan?.input} onGenerate={generate}
     running={running} plan={plan?.status === 'ready' ? plan.result : null}
     error={error || (plan?.status === 'failed' ? plan.error || 'This plan could not be completed. Please try again.' : '')}
     progress={plan?.progress.at(-1)?.message} disabled={!authReady || !client}

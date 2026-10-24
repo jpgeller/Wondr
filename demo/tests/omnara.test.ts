@@ -7,6 +7,9 @@ import { cloudTestEnabled } from '../lib/agent/example-profile';
 const input = {
   date: '2026-10-31', windowStart: '10:00', windowEnd: '17:00', timezone: 'America/Los_Angeles',
   city: 'San Francisco', interests: ['chess'],
+  organizer: { name: 'Joao', email: 'joao@example.com' },
+  dietary: ['Vegetarian'], dislikes: ['Karaoke'], budgetCap: 80,
+  vibe: 'Cozy. Energy level: Chill. Maximum travel: 5 miles. Going alone.',
 };
 const suffix = 'a'.repeat(26);
 const agent = {
@@ -66,6 +69,12 @@ test('cloud run uses the real tool dispatcher, saves to Supabase, and surfaces i
     if (url.host === 'api.omnara.com') {
       if (url.pathname.endsWith('/agents') && method === 'POST') {
         assert.equal(new Headers(init?.headers || (request instanceof Request ? request.headers : {})).get('Idempotency-Key'), 'test-plan');
+        const prompt = JSON.parse(body.message.split('\n').slice(1).join('\n'));
+        assert.deepEqual(prompt.organizer, input.organizer);
+        assert.deepEqual(prompt.dietary, ['Vegetarian']);
+        assert.deepEqual(prompt.dislikes, ['Karaoke']);
+        assert.equal(prompt.budgetCap, 80);
+        assert.match(prompt.vibe, /Chill.*5 miles.*Going alone/);
         return Response.json({ agent });
       }
       if (url.pathname.endsWith('/tool-calls')) return Response.json({ data: calls.map((call) => ({ ...toolCall, ...call })), next_cursor: null });

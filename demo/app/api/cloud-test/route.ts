@@ -6,7 +6,7 @@ import { PlanInputSchema } from '@/lib/agent/omnara-plan';
 export const runtime = 'nodejs';
 export const maxDuration = 300;
 
-// Joao's interests with the form's location and time window; no database or app login.
+// Protected preview: exercise the same profile and agent input without a database.
 export async function POST(request: Request) {
   if (!cloudTestEnabled()) return new Response('Not found', { status: 404 });
   if (request.headers.get('origin') !== new URL(request.url).origin) {
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Choose a location, date, and time window.' }, { status: 400 });
   }
   const input = PlanInputSchema.safeParse({
-    ...exampleProfile(), city: body.city, date: body.date,
+    ...exampleProfile(), ...body, city: body.city, date: body.date,
     windowStart: body.windowStart, windowEnd: body.windowEnd,
   });
   if (!input.success) return Response.json({ error: 'Enter a valid location, date, and an end time later than the start.' }, { status: 400 });
