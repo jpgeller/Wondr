@@ -32,7 +32,9 @@ export async function POST(req: Request) {
   let { error } = await db().from('profiles').upsert(row);
   // Databases without the two newer columns still save everything else.
   if (error && /energy_level|max_travel_miles/.test(error.message)) {
-    const { energy_level: _e, max_travel_miles: _m, ...base } = row;
+    const base: Record<string, unknown> = { ...row };
+    delete base.energy_level;
+    delete base.max_travel_miles;
     ({ error } = await db().from('profiles').upsert(base));
   }
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
