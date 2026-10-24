@@ -37,7 +37,7 @@ export default function LoginPage() {
     // On success the browser is already on its way to Google.
   }
 
-  return <div className={`${styles.page} ${styles.dark}`}>
+  return <div className={`${styles.page} ${styles.illustrated} ${styles.welcomePage}`}>
     <main className={`${styles.column} ${styles.welcome}`}>
         <OnboardingLogo large />
         <h1 className={styles.heading}>Stop searching.<br />Start wondering.</h1>

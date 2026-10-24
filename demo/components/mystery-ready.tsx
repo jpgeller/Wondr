@@ -9,7 +9,7 @@ export default function MysteryReady({ plan, profile, progress, error, onStart, 
   plan: Plan | null; profile: PlanInput; progress?: string; error?: string; onStart: () => void; onBack: () => void;
 }) {
   const [now, setNow] = useState<number | null>(null);
-  useEffect(() => { setNow(Date.now()); const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer); }, []);
+  useEffect(() => { window.scrollTo(0, 0); setNow(Date.now()); const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer); }, []);
   const first = plan?.stops[0];
   const date = first ? new Date(first.startsAt) : null;
   const seconds = now && date ? Math.max(0, Math.floor((date.getTime() - now) / 1000)) : 0;

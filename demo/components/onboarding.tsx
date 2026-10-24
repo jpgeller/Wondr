@@ -27,37 +27,18 @@ function Slider({ id, label, value, min, max, step = 1, display, onChange }: {
   </div>;
 }
 
-export default function Onboarding({ initial, storageKey, editing = false, onSave, onGenerate }: {
-  initial: Preferences; storageKey: string; editing?: boolean;
+export default function Onboarding({ initial, editing = false, onSave, onGenerate }: {
+  initial: Preferences; editing?: boolean;
   onSave: (preferences: Preferences) => Promise<void>;
   onGenerate: (preferences: Preferences) => Promise<void>;
 }) {
   const [answers, setAnswers] = useState(initial);
   const [step, setStep] = useState(editing ? 1 : 0);
-  const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [friend, setFriend] = useState('');
   const heading = useRef<HTMLHeadingElement>(null);
   const patch = (values: Partial<Preferences>) => setAnswers((previous) => ({ ...previous, ...values }));
-
-  useEffect(() => {
-    try {
-      const draft = JSON.parse(localStorage.getItem(storageKey) || 'null');
-      // Drafts can be incomplete while the name/interests steps are in progress.
-      const valid = PreferencesSchema.safeParse({ ...draft?.answers, name: draft?.answers?.name || 'You', interests: draft?.answers?.interests?.length ? draft.answers.interests : ['Coffee'] });
-      if (draft?.answers && valid.success) {
-        setAnswers({ ...valid.data, name: draft.answers.name || '', interests: draft.answers.interests || [] });
-        if (!editing && Number.isInteger(draft.step) && draft.step >= 0 && draft.step <= 4) setStep(draft.step);
-      }
-    } catch { /* Private browsing can disable local storage; account saving still works. */ }
-    setLoaded(true);
-  }, [storageKey, editing]);
-
-  useEffect(() => {
-    if (!loaded) return;
-    try { localStorage.setItem(storageKey, JSON.stringify({ answers, step })); } catch { /* Account saving is independent of drafts. */ }
-  }, [answers, step, storageKey, loaded]);
 
   useEffect(() => { heading.current?.focus(); }, [step]);
 
@@ -97,18 +78,17 @@ export default function Onboarding({ initial, storageKey, editing = false, onSav
       if (step === 3) setStep(4);
       else {
         await onGenerate(parsed.data);
-        try { localStorage.removeItem(storageKey); } catch { /* Optional local draft. */ }
       }
     } catch (error) { setError(error instanceof Error ? error.message : 'Could not save your answers. Please try again.'); }
     finally { setBusy(false); }
   }
 
-  if (step === 0) return <div className={`${styles.page} ${styles.dark}`}><main className={`${styles.column} ${styles.welcome}`}>
+  if (step === 0) return <div className={`${styles.page} ${styles.illustrated} ${styles.welcomePage}`}><main className={`${styles.column} ${styles.welcome}`}>
     <OnboardingLogo large />
     <h1 className={styles.heading} ref={heading} tabIndex={-1}>Stop searching.<br />Start wondering.</h1>
     <p className={styles.intro}>Tell us when you’re free. Your agent finds a real day out, shaped around you. Discover each stop as you go.</p>
     <ol className={styles.how}><li><span>1</span>Share your vibe</li><li><span>2</span>Your agent plans the day</li><li><span>3</span>Uncover your stops, one by one</li></ol>
-    <button className={styles.primary} disabled={!loaded} onClick={() => setStep(1)}>Get started</button>
+    <button className={styles.primary} onClick={() => setStep(1)}>Get started</button>
     <p className={styles.tagline}>Wonder first. Wander next.</p>
   </main></div>;
 
@@ -123,7 +103,7 @@ export default function Onboarding({ initial, storageKey, editing = false, onSav
       {step === 1 && <>
         <div className={styles.group}><div className={styles.label}><label htmlFor="name">What should we call you?</label></div><input className={styles.input} id="name" name="name" autoComplete="given-name" placeholder="Your name" maxLength={100} required defaultValue={answers.name} onInput={(e) => patch({ name: e.currentTarget.value })} /></div>
         <div className={styles.group}><div className={styles.label}><label htmlFor="city">Your neighborhood or city</label></div><input className={styles.input} id="city" name="city" autoComplete="address-level2" maxLength={200} required defaultValue={answers.city} onInput={(e) => patch({ city: e.currentTarget.value })} /></div>
-        <p className={styles.hint}>We’ll remember your taste for next time. You can change any answer later.</p>
+        <p className={styles.hint}>Tell us what fits today. Every new day starts with these questions.</p>
       </>}
       {step === 2 && <>
         <Pills label="Love" items={[...new Set([...ACTIVITIES, ...answers.interests, ...answers.dislikes])]} selected={answers.interests} onToggle={(item) => toggleActivity(item, 'interests')} />
@@ -152,7 +132,7 @@ export default function Onboarding({ initial, storageKey, editing = false, onSav
         </div>
       </>}
       {error && <p className={styles.error} role="alert">{error}</p>}
-      <div className={styles.actions}><button type="button" className={styles.back} disabled={busy} onClick={back}>Back</button><button type="submit" className={styles.primary} disabled={busy || !loaded}>{busy ? (step === 4 ? 'Starting your day…' : 'Saving…') : step === 4 ? 'Plan my mystery day' : step === 3 ? 'Save my taste' : 'Continue'}</button></div>
+      <div className={styles.actions}><button type="button" className={styles.back} disabled={busy} onClick={back}>Back</button><button type="submit" className={styles.primary} disabled={busy}>{busy ? (step === 4 ? 'Starting your day…' : 'Saving…') : step === 4 ? 'Plan my mystery day' : step === 3 ? 'Save my taste' : 'Continue'}</button></div>
     </form>
   </main></div>;
 }

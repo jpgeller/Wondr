@@ -3,11 +3,11 @@
 ## Quick cloud test — no Supabase needed
 
 Open `/cloud-test` on a **Vercel Preview deployment**, complete the onboarding
-steps, and click **Plan my mystery day**. The ready screen leads to the black
-planner. Click a stop to reveal its place, details, and source link.
+steps, and click **Plan my mystery day**. The ready screen leads to the mystery
+timeline. Click any stop to reveal or hide its place, details, and source link.
 Omnara runs the model; Vercel runs the tools. No local worker is needed.
-Keep the tab open while it runs; this test remembers answers in this browser,
-but does not persist generated results after refresh.
+Keep the tab open while it runs; this test does not persist generated results
+after refresh. Each new demo starts a fresh questionnaire.
 
 Only `OMNARA_TOKEN`, `EXA_API_KEY`, and `GOOGLE_PLACES_API_KEY` are required for
 this test. Set them for Preview and deploy again after changing values.
@@ -17,27 +17,25 @@ The page and endpoint return 404 in Production; locally they work with `npm run 
 ## Signed-in app
 
 The homepage signs in with Google, then opens welcome → name/location → interests
-and hard passes → practical preferences → day details → ready → black planner.
-`/preferences` edits these same answers. Orange bars track the four form steps.
+and hard passes → practical preferences → day details → ready → mystery timeline.
+The homepage and **Plan another day** always ask all four steps again, even for
+the same account. Previous answers and draft positions are not prefilled.
 
 `POST /api/preferences` saves the usual fields in `profiles` and the complete form
 in the user's Supabase `user_metadata.wondr_preferences`; no new SQL migration is
-needed. Local storage keeps an unfinished draft, scoped by user ID. Each plan stores
+needed. Each plan stores
 an input snapshot containing the name, interests, restrictions, budget, energy,
 travel radius, date, times, timezone, vibe, and friends. `lib/preferences.ts` validates
 and converts these answers to the existing agent contract.
 
 ## Frontend design
 
-The final planner uses the design from `main-design/`: its landscape, dark form,
-timeline, and place dialog. `components/planner-view.tsx` is shared by the signed-in
-planner and the database-free cloud test; `planner.module.css` contains the styles.
-The original supplied brand sheet lives at `public/brand/wondr-reference.png`.
-The header frames its white wordmark directly, preserving the original artwork.
-The earlier screens use `components/onboarding.module.css` for the navy, cream,
-and orange design. Their logo recolors the original wordmark through an SVG mask.
-Reveal photographs are illustrative and labelled as such; credits are in
-`main-design/README.md`. Time between stops comes from the plan, not estimated travel.
+The welcome and results pages use the supplied `public/brand/wondr-wander.png`
+artwork as a background. `components/day-timeline.tsx` shows only the saved stops,
+with venue details hidden until clicked. Demo mode allows revealing any stop early;
+there is no second generation form or late/skip/swap control.
+`components/onboarding.module.css` contains the cream, navy, and orange design.
+The logo retains the supplied wordmark's shapes through an SVG mask.
 
 ## What runs where
 

@@ -32,5 +32,5 @@ export default function AccountOnboarding({ initial, userId, email, editing = fa
     if (!response.ok) throw new Error(result.error || 'Could not start your day.');
     router.push(`/agent-test?plan=${encodeURIComponent(data.id)}&ready=1`);
   }
-  return <Onboarding initial={initial} storageKey={`wondr-onboarding:${userId}`} editing={editing} onSave={save} onGenerate={generate} />;
+  return <Onboarding initial={initial} editing={editing} onSave={save} onGenerate={generate} />;
 }
