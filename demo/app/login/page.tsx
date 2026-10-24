@@ -6,6 +6,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import WondrShell from '@/components/wondr-shell';
+import styles from '@/components/planner.module.css';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -35,25 +37,23 @@ export default function LoginPage() {
     // On success the browser is already on its way to Google.
   }
 
-  return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-8 p-6 text-center">
-      <div className="space-y-3">
-        <h1 className="text-5xl font-bold tracking-tight">WONDR</h1>
-        <p className="text-lg text-neutral-500 max-w-sm">
-          Tell us when you are free. We plan a mystery day and reveal it one stop at a time.
-        </p>
-      </div>
-      <button
+  return <WondrShell skipTo="sign-in">
+    <main className={styles.main}>
+      <section id="sign-in" className={styles.planner}>
+        <h1>Stop searching.<br />Start wondering.</h1>
+        <p className={styles.intro}>A mystery day, made for you.<br />Choose when and where. Leave the rest open.</p>
+        <div className={styles.loginAction}><button
         onClick={signIn}
         disabled={loading}
-        className="rounded-full bg-black text-white dark:bg-white dark:text-black px-6 py-3 font-medium disabled:opacity-50"
+        className={styles.generate}
       >
-        {loading ? 'Opening Google…' : 'Continue with Google'}
-      </button>
-      <p className="text-xs text-neutral-500 max-w-xs">
+        {loading ? 'Opening Google…' : 'Continue with Google'}<span aria-hidden="true">↗</span>
+      </button></div>
+      <p className={styles.note}>
         We ask for calendar access so we can add your mystery stops to your calendar.
       </p>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className={styles.error} role="alert">{error}</p>}
+      </section>
     </main>
-  );
+  </WondrShell>;
 }
