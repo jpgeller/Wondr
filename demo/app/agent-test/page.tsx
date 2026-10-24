@@ -43,6 +43,15 @@ export default function AgentTest() {
       setAuthReady(true);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, next) => setSession(next));
+    // Prefill from the saved preferences (/preferences).
+    supabase.auth.getUser().then(async ({ data: u }) => {
+      if (!u.user) return;
+      const { data: p } = await supabase.from('profiles').select('city, interests, default_window_start, default_window_end').eq('user_id', u.user.id).maybeSingle();
+      if (p?.city) setCity(p.city);
+      if (p?.interests?.length) setInterests(p.interests.join(', '));
+      if (p?.default_window_start) setStart(p.default_window_start);
+      if (p?.default_window_end) setEnd(p.default_window_end);
+    });
     return () => subscription.unsubscribe();
   }, []);
 

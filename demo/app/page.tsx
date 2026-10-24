@@ -11,6 +11,8 @@ export default async function Home() {
   if (!user) redirect('/login');
 
   const { data: token } = await db().from('google_tokens').select('user_id').eq('user_id', user.id).maybeSingle();
+  const { data: profile } = await db().from('profiles').select('interests').eq('user_id', user.id).maybeSingle();
+  if (!profile?.interests?.length) redirect('/preferences'); // first visit: onboarding
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center gap-6 p-6 text-center">
@@ -24,6 +26,7 @@ export default async function Home() {
       <Link href="/agent-test" className="rounded-full bg-black text-white dark:bg-white dark:text-black px-5 py-3">
         Try the agent →
       </Link>
+      <Link href="/preferences" className="text-sm underline">Edit my taste</Link>
       <form action="/auth/signout" method="post">
         <button className="rounded-full border px-5 py-2 text-sm">Sign out</button>
       </form>

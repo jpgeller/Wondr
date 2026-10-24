@@ -4,6 +4,7 @@ import { runAgent } from 'wondr-agent/run-agent';
 import { executeTool } from 'wondr-agent/tools';
 import { appendProgress, getPlanRow, markFailed, saveResult } from './db';
 import { createPlaceholderEvents } from '../calendar';
+import { withProfile } from './profile';
 import { PlanInputSchema, planFromTool } from './omnara-plan';
 import type { Plan, PlanInput } from '../types';
 
@@ -55,7 +56,8 @@ export async function runOmnaraPlan(planId: string): Promise<void> {
   try {
     const row = await getPlanRow(planId);
     if (!row) throw new Error('Plan not found');
-    const plan = await generateOmnaraPlan(row.input, planId, {
+    const input = await withProfile(row.user_id, row.input); // saved preferences from /preferences
+    const plan = await generateOmnaraPlan(input, planId, {
       progress: (message, step) => appendProgress(planId, message, step),
       save: (plan) => saveResult(planId, plan, 'planning'),
     });
