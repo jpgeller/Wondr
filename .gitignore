@@ -25,6 +25,9 @@ build/
 coverage/
 .nyc_output/
 
+# Locally generated agent plans
+/agent/output/
+
 # Logs
 logs/
 *.log

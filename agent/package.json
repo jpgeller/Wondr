@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "setup": "node setup.ts",
-    "start": "node create-agent.ts"
+    "start": "node create-agent.ts",
+    "test": "node --test tests/*.test.ts",
+    "test:tool": "node test-tool.ts"
   },
   "dependencies": {
     "@omnara/sdk": "0.1.37"
