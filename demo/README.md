@@ -2,8 +2,9 @@
 
 ## Quick cloud test — no Supabase needed
 
-Open `/cloud-test` on a **Vercel Preview deployment** and click **Generate plan**.
-It uses Joao's fixed example profile and displays the returned plan on the page.
+Open `/cloud-test` on a **Vercel Preview deployment**, choose a location and time
+window, and click **Generate plan**. It uses Joao's example interests and displays
+the returned stops. Click a stop to reveal its place, details, and source link.
 Omnara runs the model; Vercel runs the tools. No local worker is needed.
 Keep the tab open while it runs; this test does not persist results after refresh.
 
@@ -14,8 +15,19 @@ The page and endpoint return 404 in Production; locally they work with `npm run 
 
 ## Signed-in app
 
-Open `/agent-test` (linked from the homepage). Sign in with Google, edit the example
-profile, and press **Generate plan**. The page shows progress and the saved stops.
+Sign in from the homepage (or open `/agent-test`), edit the example
+location and time window, and press **Generate plan**. The signed-in homepage now
+opens the same planner directly. Both show progress and the saved stops.
+
+## Frontend design
+
+The working app uses the design from `main-design/`: its landscape, dark form,
+timeline, and place dialog. `components/planner-view.tsx` is shared by the signed-in
+planner and the database-free cloud test; `planner.module.css` contains the styles.
+The original supplied brand sheet lives at `public/brand/wondr-reference.png`.
+The header frames its white wordmark directly, preserving the original artwork.
+Reveal photographs are illustrative and labelled as such; credits are in
+`main-design/README.md`. Time between stops comes from the plan, not estimated travel.
 
 ## What runs where
 
