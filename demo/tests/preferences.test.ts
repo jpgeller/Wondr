@@ -24,7 +24,7 @@ test('every onboarding answer reaches the validated agent input', () => {
 });
 
 test('account memory restores full answers even without the new profile columns', () => {
-  const preferences = { ...defaultPreferences('Joao'), date: '2099-11-01', interests: ['Chess'], budget: 0, budgetCap: 0, energy: 'Chill' as const, travel: 2 };
+  const preferences = { ...defaultPreferences('Joao'), date: '2026-10-24', interests: ['Chess'], budget: 0, budgetCap: 0, energy: 'Chill' as const, travel: 2 };
   assert.deepEqual(savedPreferences({ city: 'Old city' }, { wondr_preferences: preferences }), preferences);
   const legacy = savedPreferences({ display_name: 'Joao', interests: ['Chess'], default_budget: 0, default_window_start: '11:00:00', default_window_end: '16:00:00' });
   assert.equal(legacy.budget, 0); assert.equal(legacy.windowStart, '11:00'); assert.equal(legacy.windowEnd, '16:00');

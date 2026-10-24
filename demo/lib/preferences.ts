@@ -43,7 +43,7 @@ export function defaultPreferences(name = ''): Preferences {
 export function savedPreferences(profile: Record<string, unknown> | null, metadata: Record<string, unknown> = {}): Preferences {
   const saved = PreferencesSchema.safeParse(metadata.wondr_preferences);
   const base = defaultPreferences(String(profile?.display_name || metadata.full_name || ''));
-  if (saved.success) return { ...saved.data, date: saved.data.date < base.date ? base.date : saved.data.date };
+  if (saved.success) return saved.data;
   if (!profile) return base;
   const strings = (value: unknown) => Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string').slice(0, 20) : [];
   const budget = typeof profile.default_budget === 'number' ? Math.max(0, Math.min(300, profile.default_budget)) : base.budget;

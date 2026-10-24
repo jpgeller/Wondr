@@ -47,12 +47,12 @@ export default function Onboarding({ initial, storageKey, editing = false, onSav
       // Drafts can be incomplete while the name/interests steps are in progress.
       const valid = PreferencesSchema.safeParse({ ...draft?.answers, name: draft?.answers?.name || 'You', interests: draft?.answers?.interests?.length ? draft.answers.interests : ['Coffee'] });
       if (draft?.answers && valid.success) {
-        setAnswers({ ...valid.data, name: draft.answers.name || '', interests: draft.answers.interests || [], date: valid.data.date < initial.date ? initial.date : valid.data.date });
+        setAnswers({ ...valid.data, name: draft.answers.name || '', interests: draft.answers.interests || [] });
         if (!editing && Number.isInteger(draft.step) && draft.step >= 0 && draft.step <= 4) setStep(draft.step);
       }
     } catch { /* Private browsing can disable local storage; account saving still works. */ }
     setLoaded(true);
-  }, [storageKey, editing, initial.date]);
+  }, [storageKey, editing]);
 
   useEffect(() => {
     if (!loaded) return;

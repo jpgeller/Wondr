@@ -19,7 +19,7 @@ export default function CloudTest({ profile }: { profile: PlanInput }) {
     let saved = defaultPreferences('Joao');
     try {
       const parsed = PreferencesSchema.safeParse(JSON.parse(localStorage.getItem('wondr-preview-preferences') || 'null'));
-      if (parsed.success) saved = { ...parsed.data, date: parsed.data.date < saved.date ? saved.date : parsed.data.date };
+      if (parsed.success) saved = parsed.data;
     } catch { /* Optional browser memory in the protected preview. */ }
     setInitial(saved);
   }, []);
