@@ -2,11 +2,12 @@
 
 ## Quick cloud test — no Supabase needed
 
-Open `/cloud-test` on a **Vercel Preview deployment**, choose a location and time
-window, and click **Generate plan**. It uses Joao's example interests and displays
-the returned stops. Click a stop to reveal its place, details, and source link.
+Open `/cloud-test` on a **Vercel Preview deployment**, complete the onboarding
+steps, and click **Plan my mystery day**. The ready screen leads to the black
+planner. Click a stop to reveal its place, details, and source link.
 Omnara runs the model; Vercel runs the tools. No local worker is needed.
-Keep the tab open while it runs; this test does not persist results after refresh.
+Keep the tab open while it runs; this test remembers answers in this browser,
+but does not persist generated results after refresh.
 
 Only `OMNARA_TOKEN`, `EXA_API_KEY`, and `GOOGLE_PLACES_API_KEY` are required for
 this test. Set them for Preview and deploy again after changing values.
@@ -15,17 +16,26 @@ The page and endpoint return 404 in Production; locally they work with `npm run 
 
 ## Signed-in app
 
-Sign in from the homepage (or open `/agent-test`), edit the example
-location and time window, and press **Generate plan**. The signed-in homepage now
-opens the same planner directly. Both show progress and the saved stops.
+The homepage signs in with Google, then opens welcome → name/location → interests
+and hard passes → practical preferences → day details → ready → black planner.
+`/preferences` edits these same answers. Orange bars track the four form steps.
+
+`POST /api/preferences` saves the usual fields in `profiles` and the complete form
+in the user's Supabase `user_metadata.wondr_preferences`; no new SQL migration is
+needed. Local storage keeps an unfinished draft, scoped by user ID. Each plan stores
+an input snapshot containing the name, interests, restrictions, budget, energy,
+travel radius, date, times, timezone, vibe, and friends. `lib/preferences.ts` validates
+and converts these answers to the existing agent contract.
 
 ## Frontend design
 
-The working app uses the design from `main-design/`: its landscape, dark form,
+The final planner uses the design from `main-design/`: its landscape, dark form,
 timeline, and place dialog. `components/planner-view.tsx` is shared by the signed-in
 planner and the database-free cloud test; `planner.module.css` contains the styles.
 The original supplied brand sheet lives at `public/brand/wondr-reference.png`.
 The header frames its white wordmark directly, preserving the original artwork.
+The earlier screens use `components/onboarding.module.css` for the navy, cream,
+and orange design. Their logo recolors the original wordmark through an SVG mask.
 Reveal photographs are illustrative and labelled as such; credits are in
 `main-design/README.md`. Time between stops comes from the plan, not estimated travel.
 

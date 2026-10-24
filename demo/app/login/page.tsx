@@ -6,8 +6,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
-import WondrShell from '@/components/wondr-shell';
-import styles from '@/components/planner.module.css';
+import OnboardingLogo from '@/components/onboarding-brand';
+import styles from '@/components/onboarding.module.css';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -37,23 +37,24 @@ export default function LoginPage() {
     // On success the browser is already on its way to Google.
   }
 
-  return <WondrShell skipTo="sign-in">
-    <main className={styles.main}>
-      <section id="sign-in" className={styles.planner}>
-        <h1>Stop searching.<br />Start wondering.</h1>
+  return <div className={`${styles.page} ${styles.dark}`}>
+    <main className={`${styles.column} ${styles.welcome}`}>
+        <OnboardingLogo large />
+        <h1 className={styles.heading}>Stop searching.<br />Start wondering.</h1>
         <p className={styles.intro}>A mystery day, made for you.<br />Choose when and where. Leave the rest open.</p>
-        <div className={styles.loginAction}><button
+        <ol className={styles.how}><li><span>1</span>Share your vibe</li><li><span>2</span>Your agent plans the day</li><li><span>3</span>Uncover your stops, one by one</li></ol>
+        <button
         onClick={signIn}
         disabled={loading}
-        className={styles.generate}
+        className={styles.primary}
       >
-        {loading ? 'Opening Google…' : 'Continue with Google'}<span aria-hidden="true">↗</span>
-      </button></div>
-      <p className={styles.note}>
+        {loading ? 'Opening Google…' : 'Continue with Google'}
+      </button>
+      <p className={styles.hint}>
         We ask for calendar access so we can add your mystery stops to your calendar.
       </p>
       {error && <p className={styles.error} role="alert">{error}</p>}
-      </section>
+      <p className={styles.tagline}>Wonder first. Wander next.</p>
     </main>
-  </WondrShell>;
+  </div>;
 }
