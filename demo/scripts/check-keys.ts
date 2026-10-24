@@ -59,7 +59,7 @@ const checks: Check[] = [
     async () => {
       const { count, error } = await adminDb().from('plans').select('*', { count: 'exact', head: true });
       if (error) throw new Error(error.message);
-      return `${count} rows`;
+      return `table reachable, ${count ?? 0} rows`;
     },
   ],
   [
