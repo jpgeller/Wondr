@@ -1,4 +1,5 @@
 import { bearerToken, createOmnaraClient, sdk } from '@omnara/sdk'
+import { readFile } from 'node:fs/promises'
 import { loadEnvFile } from 'node:process'
 import { fileURLToPath } from 'node:url'
 
@@ -12,6 +13,11 @@ if (
   process.exit(1)
 }
 
+const source = await readFile(new URL('agent.yaml', import.meta.url), 'utf8')
+if (!source.trim()) throw new Error('Add your agent configuration to agent.yaml before launching.')
+
+const message = process.argv.slice(2).join(' ').trim() || 'Hi! What can you do?'
+
 const result = await sdk.createAgent({
   client: createOmnaraClient({
     baseUrl: 'https://api.omnara.com/v1',
@@ -19,9 +25,9 @@ const result = await sdk.createAgent({
   }),
   path: { orgID: 'org_vc7l6n4ix2hhbny7x6xvbfey5e', projectID: 'proj_agqw7dscfn7kld6dcv2re2dnxe' },
   body: {
-    profile: 'aprf_agqw7fihi53utbdfw2yqgsirzm',
-    config: 'acfg_agqw7fig5fyifi37utoh3lh2t4',
-    message: 'Hi! What can you do?',
+    config_source: { source, source_format: 'yaml' },
+    name: 'Machine assistant',
+    message,
   },
 })
 

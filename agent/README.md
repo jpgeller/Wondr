@@ -2,9 +2,10 @@
 
 ## Working now
 
-`create-agent.ts` uses Omnara's official SDK to create a chat with the existing
-General agent and send `Hi! What can you do?`. It prints the chat URL so you can
-open the response. This checks the connection; it does not generate a day plan yet.
+`create-agent.ts` follows step 3 of Omnara's quickstart: read `agent.yaml`, send
+the config to Omnara, and create a chat with an initial message. It prints the
+chat URL so you can open the response. The YAML currently contains the guide's
+engineering assistant example; it does not generate a day plan yet.
 
 Use Node.js 24 or newer:
 
@@ -21,12 +22,27 @@ with your Omnara token. The existing local token has already been moved here.
 npm start
 ```
 
-Each run creates a new chat. Continue an existing chat in Omnara instead of
-running the command again.
+This sends `Hi! What can you do?`. To supply a different first message:
+
+```sh
+npm start -- "Find three interesting things to do in San Francisco this Saturday."
+```
+
+Edit `agent.yaml` to change the agent's ongoing instructions, model, or tools.
+Each launch reads the saved YAML again and creates a new chat. To continue an
+existing chat, use its link in Omnara. No new code file is needed for each task.
+
+## Optional account setup check
+
+`setup.ts` runs the SDK setup snippet from Omnara's documentation. Set
+`OMNARA_TOKEN` in `.env` to a **Personal token**, then run `npm run setup` from
+this folder. It prints the first available organization and project IDs and
+does not create an agent or change the launcher settings. The existing launcher
+already has its IDs, so this check is optional.
 
 ## Next implementation
 
-Keep the input/output contract in [build-plan.md](../build-plan.md) unchanged:
+Keep the input/output contract in [build-plan.md](build-plan.md) unchanged:
 
 ```ts
 // Input
