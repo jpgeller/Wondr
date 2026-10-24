@@ -85,23 +85,23 @@ export default function Preferences() {
     if (!userId) return;
     setSaving(true);
     setError('');
-    const supabase = supabaseBrowser();
-    const base = {
-      user_id: userId,
-      city,
-      default_window_start: windowStart,
-      default_window_end: windowEnd,
-      interests: love,
-      dislikes: pass,
-      dietary: dietary.filter((d) => d !== 'None'),
-      default_budget: budget,
-      updated_at: new Date().toISOString(),
-    };
-    let { error } = await supabase.from('profiles').upsert({ ...base, energy_level: ENERGY[energy], max_travel_miles: travel });
-    // Older databases without the two newer columns still save everything else.
-    if (error && /energy_level|max_travel_miles/.test(error.message)) ({ error } = await supabase.from('profiles').upsert(base));
+    const res = await fetch('/api/preferences', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        city,
+        default_window_start: windowStart,
+        default_window_end: windowEnd,
+        interests: love,
+        dislikes: pass,
+        dietary: dietary.filter((d) => d !== 'None'),
+        default_budget: budget,
+        energy_level: ENERGY[energy],
+        max_travel_miles: travel,
+      }),
+    });
     setSaving(false);
-    if (error) return setError(error.message);
+    if (!res.ok) return setError((await res.json().catch(() => null))?.error ?? 'Could not save, try again');
     router.push('/agent-test');
   }
 
