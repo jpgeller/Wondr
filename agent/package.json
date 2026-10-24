@@ -1,0 +1,12 @@
+{
+  "name": "wondr-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node create-agent.ts"
+  },
+  "dependencies": {
+    "@omnara/sdk": "0.1.37"
+  }
+}
