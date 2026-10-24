@@ -1,0 +1,37 @@
+# Installed dependencies (in any project folder)
+node_modules/
+
+# Local credentials; keep the shareable template
+.env
+.env.*
+!.env.example
+
+# Build output and deployment state
+.next/
+out/
+dist/
+build/
+.vercel/
+
+# Caches and generated metadata
+.turbo/
+.cache/
+.npm/
+.pnpm-store/
+*.tsbuildinfo
+.eslintcache
+
+# Test output
+coverage/
+.nyc_output/
+
+# Locally generated agent plans
+/agent/output/
+
+# Logs
+logs/
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
