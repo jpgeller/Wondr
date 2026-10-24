@@ -57,9 +57,29 @@ const checks: Check[] = [
     'Supabase plans table',
     ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'],
     async () => {
-      const { count, error } = await adminDb().from('plans').select('*', { count: 'exact', head: true });
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      if (!/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(url))
+        throw new Error(`NEXT_PUBLIC_SUPABASE_URL should look like https://<project>.supabase.co with nothing after it`);
+      // A plain select, not a head request: head requests swallow a 404 and look like success.
+      const { error } = await adminDb().from('plans').select('id').limit(1);
       if (error) throw new Error(error.message);
-      return `table reachable, ${count ?? 0} rows`;
+      for (const table of ['profiles', 'google_tokens']) {
+        const r = await adminDb().from(table).select('user_id').limit(1);
+        if (r.error) throw new Error(`${table}: ${r.error.message}`);
+      }
+      return 'profiles, plans, google_tokens reachable';
+    },
+  ],
+  [
+    'Supabase Google sign-in',
+    ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY'],
+    async () => {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/settings`, {
+        headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! },
+      });
+      const settings = await res.json();
+      if (!settings?.external?.google) throw new Error('Google provider is not enabled in Supabase Authentication');
+      return 'enabled';
     },
   ],
   [
