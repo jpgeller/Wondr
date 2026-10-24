@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080808">
+  <title>Wondr — Plan a day</title>
+  <link rel="icon" href="assets/favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="landscape" aria-hidden="true"></div>
+  <a class="skip-link" href="#plan-form">Skip to form</a>
+  <header>
+    <a class="wordmark" href="index.html">Wondr</a>
+    <nav aria-label="Account"><span>Joao</span></nav>
+  </header>
+
+  <main>
+    <section class="planner" aria-labelledby="planner-title">
+      <h1 id="planner-title">Plan a day.</h1>
+      <p class="intro">Choose when and where. Leave the rest open.</p>
+      <form id="plan-form">
+        <div class="field">
+          <label for="location">Location</label>
+          <input id="location" name="location" value="San Francisco, CA" autocomplete="address-level2" maxlength="80" required>
+        </div>
+        <div class="field">
+          <label for="date">Date</label>
+          <input id="date" name="date" type="date" required>
+        </div>
+        <div class="time-fields">
+          <div class="field"><label for="start">From</label><input id="start" name="start" type="time" value="10:00" required></div>
+          <div class="field"><label for="end">Until</label><input id="end" name="end" type="time" value="17:00" required></div>
+        </div>
+        <p id="form-error" role="alert" hidden></p>
+        <button class="generate" type="submit">Generate plan <span aria-hidden="true">↗</span></button>
+      </form>
+      <p class="demo-note">Design preview · Sample results</p>
+    </section>
+
+    <section class="results" aria-labelledby="results-title" hidden>
+      <div class="results-heading"><h2 id="results-title">Your day</h2><span id="result-date"></span></div>
+      <p class="result-location" id="result-location"></p>
+      <div id="stops"></div>
+      <p class="results-note">Open a stop when you’re ready to see the place.</p>
+      <p class="results-note sample-note">Sample San Francisco itinerary. Times and travel are illustrative.</p>
+    </section>
+    <p class="status sr-only" role="status" aria-live="polite"></p>
+  </main>
+
+  <footer><span>A day outside the usual.</span><span>04 / Wondr</span></footer>
+
+  <dialog aria-labelledby="place-name">
+    <button class="close" aria-label="Close place details">×</button>
+    <img id="place-image" alt="">
+    <div class="place-copy">
+      <p class="place-time" id="place-time"></p>
+      <h2 id="place-name"></h2>
+      <p id="place-description"></p>
+      <p id="place-address"></p>
+      <a id="place-link" target="_blank" rel="noopener noreferrer">View place <span aria-hidden="true">↗</span></a>
+      <p class="image-note">Design preview. Photograph is illustrative.</p>
+    </div>
+  </dialog>
+</body>
+</html>
