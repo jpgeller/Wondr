@@ -1,5 +1,19 @@
 # Wondr cloud demo
 
+## Quick cloud test — no Supabase needed
+
+Open `/cloud-test` on a **Vercel Preview deployment** and click **Generate plan**.
+It uses Joao's fixed example profile and displays the returned plan on the page.
+Omnara runs the model; Vercel runs the tools. No local worker is needed.
+Keep the tab open while it runs; this test does not persist results after refresh.
+
+Only `OMNARA_TOKEN`, `EXA_API_KEY`, and `GOOGLE_PLACES_API_KEY` are required for
+this test. Set them for Preview and deploy again after changing values.
+Keep Vercel Authentication enabled for previews so only team members can run it.
+The page and endpoint return 404 in Production; locally they work with `npm run dev`.
+
+## Signed-in app
+
 Open `/agent-test` (linked from the homepage). Sign in with Google, edit the example
 profile, and press **Generate plan**. The page shows progress and the saved stops.
 

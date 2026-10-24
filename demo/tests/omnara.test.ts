@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { PlanInputSchema, planFromTool } from '../lib/agent/omnara-plan';
-import { runOmnaraPlan } from '../lib/agent/omnara';
+import { generateOmnaraPlan, runOmnaraPlan } from '../lib/agent/omnara';
+import { cloudTestEnabled } from '../lib/agent/example-profile';
 
 const input = {
   date: '2026-10-31', windowStart: '10:00', windowEnd: '17:00', timezone: 'America/Los_Angeles',
@@ -48,11 +49,13 @@ test('cloud run uses the real tool dispatcher, saves to Supabase, and surfaces i
   let calls: Array<{ id: string; name: string; input: unknown }> = [];
   const submitted: string[] = [];
   let providerQuery = '';
+  let allowDatabase = true;
   t.mock.method(globalThis, 'fetch', async (request: string | URL | Request, init?: RequestInit) => {
     const url = new URL(request instanceof Request ? request.url : String(request));
     const method = init?.method || (request instanceof Request ? request.method : 'GET');
     const body = init?.body ? JSON.parse(String(init.body)) : request instanceof Request && method === 'POST' ? await request.json() : {};
     if (url.host === 'wondr-test.supabase.co') {
+      assert.ok(allowDatabase, 'The standalone cloud test must not access Supabase');
       if (method === 'PATCH') { Object.assign(row, body); return new Response(null, { status: 204 }); }
       return Response.json(row);
     }
@@ -92,9 +95,25 @@ test('cloud run uses the real tool dispatcher, saves to Supabase, and surfaces i
   assert.equal(row.status, 'ready');
   assert.deepEqual(row.result, planFromTool(plan, input));
 
+  allowDatabase = false;
+  const standalonePlan = await generateOmnaraPlan(input, 'test-plan');
+  assert.deepEqual(standalonePlan, planFromTool(plan, input));
+  allowDatabase = true;
+
   row = { id: 'test-plan', input, progress: [], status: 'planning' };
   calls = [];
   await runOmnaraPlan('test-plan');
   assert.equal(row.status, 'failed');
   assert.match(String(row.error), /without a verified plan/);
+});
+
+test('the database-free test is available in previews and disabled in production', (t) => {
+  const previous = { NODE_ENV: process.env.NODE_ENV, VERCEL_ENV: process.env.VERCEL_ENV };
+  t.after(() => { for (const [key, value] of Object.entries(previous)) {
+    if (value === undefined) delete process.env[key]; else process.env[key] = value;
+  } });
+  Object.assign(process.env, { NODE_ENV: 'production', VERCEL_ENV: 'production' });
+  assert.equal(cloudTestEnabled(), false);
+  process.env.VERCEL_ENV = 'preview';
+  assert.equal(cloudTestEnabled(), true);
 });
