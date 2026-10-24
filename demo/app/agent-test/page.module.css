@@ -1,0 +1,42 @@
+.page { min-height: 100vh; background: #f7f6f0; color: #24372d; padding: 28px max(24px, calc((100vw - 1100px) / 2)) 64px; }
+.header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 28px; border-bottom: 1px solid #d9ded4; }
+.logo { font-size: 28px; font-weight: 750; letter-spacing: -1.5px; text-decoration: none; }
+.logo span { color: #d97648; margin-left: 5px; }
+.badge { border: 1px solid #b9c6ba; border-radius: 30px; padding: 6px 14px; font-size: 12px; }
+.intro { margin: 42px 0 34px; }
+.intro h1 { font-size: clamp(32px, 5vw, 52px); line-height: 1.15; letter-spacing: -2px; font-weight: 600; margin: 8px 0 14px; }
+.intro > p:last-child { color: #637166; }
+.eyebrow { text-transform: uppercase; font-size: 11px; letter-spacing: 1.6px; color: #637166; font-weight: 650; }
+.columns { display: grid; grid-template-columns: 410px 1fr; gap: 38px; align-items: start; }
+.card { border: 1px solid #dce1d6; background: #fffef9; padding: 27px; border-radius: 20px; }
+.card h2 { font-size: 21px; font-weight: 600; margin-bottom: 8px; }
+.muted, .small { color: #637166; line-height: 1.5; }
+.muted { font-size: 13px; margin: 8px 0 18px; }
+.small { font-size: 11px; margin: 12px 0 0; }
+.card fieldset { border: 0; margin: 22px 0; padding: 0; }
+.card label { display: flex; flex-direction: column; gap: 7px; margin-top: 16px; font-size: 12px; font-weight: 550; }
+.card input, .card textarea { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid #d6ddd2; border-radius: 8px; background: #fff; color: #24372d; font: inherit; font-size: 13px; font-weight: 400; }
+.card input:focus, .card textarea:focus { outline: 2px solid #8aa891; outline-offset: 2px; }
+.row { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 8px; }
+.row input { padding: 10px 6px; }
+.primary { width: 100%; border: 0; border-radius: 10px; background: #264c36; color: white; padding: 14px 16px; cursor: pointer; font-weight: 550; font-size: 14px; }
+.primary:hover { background: #1c3c2a; }
+.primary:disabled { opacity: .55; cursor: default; }
+.textButton { margin-top: 10px; font-size: 11px; text-decoration: underline; cursor: pointer; }
+.results { padding-top: 6px; }
+.empty { text-align: center; padding: 75px 30px; color: #637166; }
+.empty > span { display: block; font-size: 68px; color: #c2ccb8; }
+.empty h2 { color: #364e3e; font-size: 24px; margin: 14px 0 12px; }
+.empty p { font-size: 14px; line-height: 1.7; max-width: 300px; margin: auto; }
+.error { background: #f9e9df; color: #8c3924; border-radius: 10px; padding: 16px; margin-bottom: 20px; font-size: 14px; overflow-wrap: anywhere; }
+.progress { padding-left: 18px; list-style: disc; font-size: 13px; line-height: 1.6; }
+.progress li { margin: 10px 0; }
+.planTitle { font-size: 30px; font-weight: 600; margin: 8px 0 12px; }
+.stop { background: #fffef9; border: 1px solid #dce1d6; border-radius: 15px; padding: 22px; margin: 18px 0; }
+.stop h3 { font-size: 20px; font-weight: 600; margin: 7px 0 12px; }
+.stop p:not(.eyebrow):not(.muted) { font-size: 14px; line-height: 1.7; }
+.stop a { font-size: 12px; color: #315c3d; text-decoration: underline; text-underline-offset: 3px; }
+.raw { font-size: 12px; margin: 24px 0; }
+.raw summary { cursor: pointer; }
+.raw pre { white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 12px; padding: 16px; background: #e9ede3; border-radius: 10px; }
+@media (max-width: 780px) { .columns { grid-template-columns: 1fr; gap: 24px; } .intro { margin-top: 30px; } .card { padding: 22px; } .empty { padding: 30px 20px; } }

@@ -12,7 +12,12 @@ export function adminDb(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) throw new Error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set');
-  client = createClient(url, key, { auth: { persistSession: false } });
+  client = createClient(url, key, {
+    auth: { persistSession: false },
+    global: { fetch: (input, init) => fetch(input, {
+      ...init, signal: AbortSignal.any([AbortSignal.timeout(10_000), ...(init?.signal ? [init.signal] : [])]),
+    }) },
+  });
   return client;
 }
 
@@ -20,6 +25,16 @@ export async function getPlanRow(planId: string): Promise<PlanRow | null> {
   const { data, error } = await adminDb().from('plans').select('*').eq('id', planId).maybeSingle();
   if (error) throw new Error(`Load plan: ${error.message}`);
   return data as PlanRow | null;
+}
+
+/** An atomic claim prevents double clicks from launching two paid agents. */
+export async function claimPlan(planId: string, userId: string): Promise<boolean> {
+  const progress = [{ at: new Date().toISOString(), message: 'Starting your planner', step: 'starting' }];
+  const { data, error } = await adminDb().from('plans').update({ progress })
+    .eq('id', planId).eq('user_id', userId).eq('status', 'planning').eq('progress', '[]')
+    .select('id');
+  if (error) throw new Error(`Start plan: ${error.message}`);
+  return (data?.length ?? 0) === 1;
 }
 
 /** Appends one progress message. One writer per plan at a time, so read-modify-write is fine. */

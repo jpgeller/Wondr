@@ -60,7 +60,7 @@ test('missing keys and provider errors are failed tool results', async (t) => {
 })
 
 test('save_plan writes the supplied plan and rejects malformed stops', async (t) => {
-  const plan = { stops: [{ time: '2026-10-31T12:00:00-07:00', title: 'Test stop', address: 'Test address', url: 'https://example.com', why: 'Test reason' }] }
+  const plan = { stops: [{ startsAt: '2026-10-31T12:00:00-07:00', endsAt: '2026-10-31T13:00:00-07:00', title: 'Test stop', venueName: 'Test venue', category: 'food', address: 'Test address', sourceUrl: 'https://example.com', description: 'Test reason' }] }
   const result = await executeTool('save_plan', plan)
   assert.equal(result.outcome, 'succeeded')
   const saved = JSON.parse(result.content_blocks[0].text)

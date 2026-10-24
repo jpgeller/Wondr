@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "./run-agent": "./run-agent.ts",
+    "./tools": "./tools/index.ts"
+  },
+  "files": ["run-agent.ts", "tool-worker.ts", "agent.yaml", "tools"],
   "scripts": {
     "setup": "node setup.ts",
     "start": "node create-agent.ts",

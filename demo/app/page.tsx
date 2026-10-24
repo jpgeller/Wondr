@@ -2,6 +2,7 @@
 // connected. Placeholder until the profile, plan and timeline screens exist.
 
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { db } from '@/lib/supabase/admin';
 import { currentUser } from '@/lib/supabase/server';
 
@@ -20,6 +21,9 @@ export default async function Home() {
       <p className={token ? 'text-green-600' : 'text-amber-600'}>
         {token ? 'Google Calendar connected' : 'Google Calendar not connected. Sign out and in again to connect it.'}
       </p>
+      <Link href="/agent-test" className="rounded-full bg-black text-white dark:bg-white dark:text-black px-5 py-3">
+        Try the agent →
+      </Link>
       <form action="/auth/signout" method="post">
         <button className="rounded-full border px-5 py-2 text-sm">Sign out</button>
       </form>

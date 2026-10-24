@@ -21,8 +21,13 @@ instruction: |
      geographically close, allow time to travel, and explain why each fits this
      user. A running activity or solo-friendly chess event may suit this profile,
      but only include a concrete recommendation when tool results support it.
-  5. Call save_plan once with {stops: [{time, title, address, url, why}]}.
-     Use ISO 8601 times with an offset. If nothing is verified, use {stops: []}.
+  5. Call save_plan with the complete plan: title, teaser, dressCode, date,
+     and stops. Each stop needs its position (starting at 1), title, category,
+     venueName, address, startsAt, endsAt, description, and sourceUrl.
+     Use ISO 8601 times with the outing timezone's offset. Do not overlap stops
+     or place them outside the requested window. Explain the personal fit in
+     description. Keep title and teaser free of venue names for the surprise reveal.
+     If nothing is verified, explain that and finish without saving a plan.
      After a successful save, give a short final response and end the turn. Do not
      continue calling tools. The save_plan result does not itself end the turn.
 
@@ -33,8 +38,10 @@ instruction: |
     Current opening hours may not cover the outing date; verify when needed.
   - If a tool reports a missing key or provider error, explain the limitation.
     Do not invent results or repeatedly retry the same failed request.
-  - save_plan writes a JSON file on the tool runner. It does not publish to the
-    frontend or make bookings. Only claim a successful save after confirmation.
+  - save_plan persists the plan using the tool runner's configured storage.
+    It never makes bookings. Only claim a successful save after confirmation.
+  - Keep the research focused: normally one event search, one places search,
+    and a few page checks are enough. Finish within four minutes.
 model:
   provider_config: omnara-openrouter
   name: anthropic/claude-fable-5.1
@@ -74,23 +81,33 @@ tools:
   save_plan:
     type: custom
     description: >-
-      Write the final plan to a local JSON file, then finish the turn. Returns
-      the saved file path. An empty stops list is valid when nothing is verified.
+      Save the final verified plan, then finish the turn. This saves to the
+      configured storage (Supabase in the web app, a JSON file in the CLI).
+      No reservations are made by this tool.
     input_schema:
       type: object
       additionalProperties: false
       properties:
+        title: { type: string }
+        teaser: { type: string }
+        dressCode: { type: string }
+        date: { type: string, description: Outing date as YYYY-MM-DD. }
         stops:
           type: array
+          minItems: 1
           maxItems: 3
           items:
             type: object
             additionalProperties: false
             properties:
-              time: { type: string, description: Visit time in ISO 8601 with offset. }
+              position: { type: integer, minimum: 1 }
               title: { type: string }
+              category: { type: string }
+              venueName: { type: string }
               address: { type: string }
-              url: { type: string }
-              why: { type: string }
-            required: [time, title, address, url, why]
-      required: [stops]
+              startsAt: { type: string, description: Start in ISO 8601 with timezone offset. }
+              endsAt: { type: string, description: End in ISO 8601 with timezone offset. }
+              sourceUrl: { type: string, description: Verified HTTP or HTTPS source. }
+              description: { type: string, description: What to do and why it fits this user. }
+            required: [position, title, category, venueName, address, startsAt, endsAt, sourceUrl, description]
+      required: [title, teaser, dressCode, date, stops]
