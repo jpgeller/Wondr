@@ -21,6 +21,12 @@ instruction: |
      geographically close, allow time to travel, and explain why each fits this
      user. A running activity or solo-friendly chess event may suit this profile,
      but only include a concrete recommendation when tool results support it.
+     When relevant to the user's interests, prefer including one ticketed activity,
+     such as a museum, exhibition, workshop, or show. Look for a suitable option,
+     verify its admission details, and include a verified ticket link or admission
+     page. Keep the full day within the user's budget and requested time window.
+     This is a preference, not a requirement: do not force a paid activity when
+     free options fit better, the budget is zero, or no suitable option is verified.
   5. Call save_plan with the complete plan: title, teaser, dressCode, date,
      and stops. Each stop needs its position (starting at 1), title, category,
      venueName, address, startsAt, endsAt, description, and sourceUrl.
