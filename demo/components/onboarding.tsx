@@ -64,7 +64,7 @@ export default function Onboarding({ initial, editing = false, onSave, onGenerat
     const next = { ...answers };
     if (step === 1) { next.name = String(data.get('name')).trim(); next.city = String(data.get('city')).trim(); }
     if (step === 4) {
-      for (const key of ['date', 'windowStart', 'windowEnd', 'city', 'timezone'] as const) next[key] = String(data.get(key));
+      for (const key of ['date', 'windowStart', 'windowEnd', 'timezone'] as const) next[key] = String(data.get(key));
       if (friend.trim()) { setError('Click Add next to your friend’s email, or clear it to continue.'); return; }
     }
     patch(next);
@@ -119,12 +119,10 @@ export default function Onboarding({ initial, editing = false, onSave, onGenerat
         <div className={styles.group}><div className={styles.label}><label htmlFor="date">When</label></div><input className={styles.input} type="date" id="date" name="date" required defaultValue={answers.date} onInput={(e) => patch({ date: e.currentTarget.value })} />
           <div className={styles.times}><div><label className={styles.smallLabel} htmlFor="start">From</label><input className={styles.input} id="start" name="windowStart" type="time" required defaultValue={answers.windowStart} onInput={(e) => patch({ windowStart: e.currentTarget.value })} /></div><div><label className={styles.smallLabel} htmlFor="end">Until</label><input className={styles.input} id="end" name="windowEnd" type="time" required defaultValue={answers.windowEnd} onInput={(e) => patch({ windowEnd: e.currentTarget.value })} /></div></div>
         </div>
-        <div className={styles.group}><div className={styles.label}><label htmlFor="where">Where</label></div><input className={styles.input} name="city" id="where" required maxLength={200} defaultValue={answers.city} onInput={(e) => patch({ city: e.currentTarget.value })} /></div>
         <div className={styles.group}><div className={styles.label}><label htmlFor="timezone">Local time zone</label></div><select className={styles.input} name="timezone" id="timezone" defaultValue={answers.timezone} onChange={(e) => patch({ timezone: e.target.value })}>
           {[...new Set([answers.timezone, 'America/Los_Angeles', 'America/Denver', 'America/Chicago', 'America/New_York', 'Europe/London', 'Europe/Lisbon', 'Europe/Copenhagen', Intl.DateTimeFormat().resolvedOptions().timeZone])].map((zone) => <option key={zone} value={zone}>{zone.replaceAll('_', ' ').replaceAll('/', ' / ')}</option>)}
         </select></div>
         <Pills label="Vibe" items={VIBES} selected={[answers.vibe]} onToggle={(vibe) => patch({ vibe: vibe as Preferences['vibe'] })} />
-        <Slider id="cap" label="Budget cap per person" value={answers.budgetCap} min={0} max={300} step={10} display={`$${answers.budgetCap}`} onChange={(budgetCap) => patch({ budgetCap })} />
         <div className={styles.group}><div className={styles.label}><label htmlFor="friend">Who’s coming</label></div>
           <div className={styles.friendRow}><input id="friend" className={styles.input} inputMode="email" autoComplete="off" placeholder="friend@email.com" value={friend} onChange={(e) => setFriend(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addFriend(); } }} /><button type="button" className={styles.add} onClick={addFriend}>Add</button></div>
           <div className={styles.friends}>{answers.friendEmails.map((email) => <button type="button" key={email} className={styles.pill} aria-label={`Remove ${email}`} onClick={() => patch({ friendEmails: answers.friendEmails.filter((f) => f !== email) })}>{email} ×</button>)}</div>
