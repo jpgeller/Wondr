@@ -75,7 +75,6 @@
 .dayPanel { width: min(100%, 460px); min-height: auto; padding: 28px 28px 24px; }
 .dayHeading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .dayEyebrow { color: #53596b; font-size: 11px; font-weight: 650; letter-spacing: 1.6px; text-transform: uppercase; margin: 0 0 4px; }
-.demoBadge { border-radius: 15px; background: #ff8a342b; color: #6f360e; font-size: 11px; padding: 5px 10px; white-space: nowrap; font-weight: 650; }
 .dayMeta { font-size: 13px; margin: 3px 0 12px; color: #53596b; }
 .dayHint { font-size: 13px; color: #53596b; line-height: 1.6; margin: 0 0 26px; }
 .timeline { list-style: none; padding: 0; margin: 0; }
@@ -95,12 +94,29 @@
 .stopDetails { padding: 0 18px 20px; border-top: 1px solid #d5cbbb80; }
 .stopDetails h2 { margin: 16px 0 8px; font-size: 15px; font-weight: 650; }
 .stopDetails p { margin: 0 0 12px; font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
-.stopAddress { opacity: .8; }
+.stopAddress { display: block; font-size: 12px; line-height: 1.6; margin: 0 0 16px; opacity: .85; text-decoration: underline; text-underline-offset: 3px; }
 .stopLinks { display: flex; flex-wrap: wrap; gap: 14px; }
 .stopLinks a { font-size: 12px; font-weight: 650; text-decoration: underline; text-underline-offset: 4px; }
 .timezoneNote { font-size: 11px; color: #646579; margin: 0 0 0 50px; }
 .newDay { margin-top: 28px; }
 .newDay p { text-align: center; margin: 12px 0 0; color: #646579; font-size: 11px; }
+.otherInput { margin-top: 12px; }
+.stopDetails .stopSummary { margin-top: 16px; }
+.placePhoto { margin: 16px 0 12px; }
+.placePhoto img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 13px; }
+.placePhoto figcaption { margin-top: 6px; font-size: 12px; line-height: 1.45; color: #5e5e5e; }
+.timelineItem[data-active=true] .placePhoto figcaption { color: #fff; }
+.placePhoto a { text-decoration: underline; text-underline-offset: 2px; }
+.travelLeg { grid-column: 2; margin: 0 0 2px; padding: 2px 0 7px; font-size: 12px; color: #53596b; line-height: 1.5; }
+.travelLeg span { font-size: 10px; opacity: .8; margin-left: 4px; }
+.ticket { background: #e4eee4; color: #214f39; border-radius: 12px; margin: 0 0 16px; font-size: 12px; }
+.ticket summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; list-style: none; padding: 12px; font-weight: 650; }
+.ticket summary::-webkit-details-marker { display: none; }
+.ticket small { display: block; font-size: 10px; font-weight: 400; margin: 3px 0 0 13px; }
+.ticket summary > span:last-child { font-size: 11px; white-space: nowrap; text-decoration: underline; text-underline-offset: 3px; }
+.ticketBody { border-top: 1px dashed #94bba3; padding: 12px; }
+.ticketBody p { font-size: 12px; margin: 6px 0; }
+.ticketBody a { display: inline-block; margin-top: 5px; text-decoration: underline; }
 @media (max-width: 600px) {
   .illustrated { background-position: 72% center; background-attachment: scroll; }
   .welcomePage, .resultsPage { padding: 20px 16px; align-items: flex-start; }

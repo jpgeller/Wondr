@@ -29,6 +29,17 @@ export const StopSchema = z.object({
   endsAt: isoWithOffset,
   description: z.string(),
   sourceUrl: z.string().optional(),
+  googlePlaceId: z.string().regex(/^[A-Za-z0-9_-]+$/).max(300).optional(),
+  travelFromPrevious: z.object({
+    mode: z.enum(['walking', 'driving']),
+    minutes: z.number().int().min(1).max(300),
+    distanceMiles: z.number().min(0).max(200),
+  }).optional(),
+  admission: z.object({
+    kind: z.enum(['free', 'ticket', 'pay_on_site']),
+    priceUsd: z.number().nonnegative().optional(),
+    ticketUrl: z.url().refine((url) => /^https?:\/\//i.test(url), 'Use an HTTP or HTTPS ticket link').optional(),
+  }).optional(),
   booking: StopBookingSchema,
 });
 

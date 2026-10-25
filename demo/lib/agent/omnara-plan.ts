@@ -31,7 +31,7 @@ export function planFromTool(raw: Record<string, unknown>, input: PlanInput): Pl
   if (plan.date !== input.date) throw new Error('The plan must use the requested date');
   const start = localToDate(input.date, input.windowStart, input.timezone).getTime();
   const end = localToDate(input.date, input.windowEnd, input.timezone).getTime();
-  for (const stop of plan.stops) {
+  for (const [index, stop] of plan.stops.entries()) {
     const from = Date.parse(stop.startsAt);
     const to = Date.parse(stop.endsAt);
     if (!Number.isFinite(from) || !Number.isFinite(to) || from < start || to > end) {
@@ -39,6 +39,10 @@ export function planFromTool(raw: Record<string, unknown>, input: PlanInput): Pl
     }
     if (!stop.sourceUrl || !/^https?:\/\//i.test(stop.sourceUrl)) {
       throw new Error('Every stop needs a verified HTTP or HTTPS source URL');
+    }
+    const previous = plan.stops[index - 1];
+    if (previous && stop.travelFromPrevious && from - Date.parse(previous.endsAt) < stop.travelFromPrevious.minutes * 60_000) {
+      throw new Error('Leave enough time between stops for the estimated journey');
     }
   }
   return plan;

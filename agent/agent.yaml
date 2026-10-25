@@ -16,7 +16,7 @@ instruction: |
      send it unchanged; choose the location, dates, and interests in your query.
   3. Use fetch_page to read source URLs and check event dates,
      timezone, venue address, opening hours, and booking requirements. Never
-     invent a URL, event, address, opening time, ticket availability, or distance.
+     invent a URL, event, address, opening time, ticket availability, or purchase.
   4. Select up to three supported stops inside the requested window. Keep them
      geographically close, allow time to travel, and explain why each fits this
      user. A running activity or solo-friendly chess event may suit this profile,
@@ -26,7 +26,22 @@ instruction: |
      venueName, address, startsAt, endsAt, description, and sourceUrl.
      Use ISO 8601 times with the outing timezone's offset. Do not overlap stops
      or place them outside the requested window. Explain the personal fit in
-     description. Keep title and teaser free of venue names for the surprise reveal.
+     description in one or two short sentences, at most 35 words and 240 characters.
+     Give the experience and one personal reason to go; omit research notes,
+     catalog lists, opening hours, and pricing caveats from this text.
+     Keep title and teaser free of venue names for the surprise reveal.
+     Copy googlePlaceId from Google Places when a matching result is available.
+     For each stop after the first, include travelFromPrevious: mode (walking or
+     driving), minutes, and distanceMiles. Make a reasonable conservative estimate
+     using the verified addresses; these are explicitly shown as estimates, not
+     live directions. Allow at least that many minutes between stops.
+     Include admission.kind: free for verified free activities, ticket for paid
+     admissions (museums, shows, events), or pay_on_site for restaurants and cafes.
+     Include priceUsd only when verified. For ticketed stops, find and copy a
+     verified ticket purchase URL into ticketUrl; if direct checkout is unavailable,
+     use the verified venue page that explains admission. Never invent a payment
+     link. Never treat a restaurant meal as a purchased ticket.
+     Leave admission out if you cannot verify it; never guess a paid/free status.
      If nothing is verified, explain that and finish without saving a plan.
      After a successful save, give a short final response and end the turn. Do not
      continue calling tools. The save_plan result does not itself end the turn.
@@ -35,6 +50,7 @@ instruction: |
   - Search results are leads, not proof of an event's date or availability.
     A page's publication date is not necessarily the event date.
   - Google Places returns opening hours when available, not travel distances.
+    Travel estimates are allowed, but never describe them as measured routes.
     Current opening hours may not cover the outing date; verify when needed.
   - If a tool reports a missing key or provider error, explain the limitation.
     Do not invent results or repeatedly retry the same failed request.
@@ -108,6 +124,23 @@ tools:
               startsAt: { type: string, description: Start in ISO 8601 with timezone offset. }
               endsAt: { type: string, description: End in ISO 8601 with timezone offset. }
               sourceUrl: { type: string, description: Verified HTTP or HTTPS source. }
-              description: { type: string, description: What to do and why it fits this user. }
+              description: { type: string, maxLength: 240, description: One or two short sentences, at most 35 words. Experience and personal fit only. }
+              googlePlaceId: { type: string, description: Copy the id from the matching Google Places result. }
+              travelFromPrevious:
+                type: object
+                additionalProperties: false
+                properties:
+                  mode: { type: string, enum: [walking, driving] }
+                  minutes: { type: integer, minimum: 1, maximum: 300 }
+                  distanceMiles: { type: number, minimum: 0, maximum: 200 }
+                required: [mode, minutes, distanceMiles]
+              admission:
+                type: object
+                additionalProperties: false
+                properties:
+                  kind: { type: string, enum: [free, ticket, pay_on_site] }
+                  priceUsd: { type: number, minimum: 0 }
+                  ticketUrl: { type: string, description: Verified admission purchase link. Never invent a URL. }
+                required: [kind]
             required: [position, title, category, venueName, address, startsAt, endsAt, sourceUrl, description]
       required: [title, teaser, dressCode, date, stops]

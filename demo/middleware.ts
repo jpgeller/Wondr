@@ -6,7 +6,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
   // The team-only preview smoke test deliberately has no Supabase dependency.
-  if (request.nextUrl.pathname === '/cloud-test' || request.nextUrl.pathname === '/api/cloud-test') {
+  if (['/cloud-test', '/api/cloud-test', '/api/place-photo', '/design-preview'].includes(request.nextUrl.pathname)) {
     return NextResponse.next();
   }
   let response = NextResponse.next({ request });

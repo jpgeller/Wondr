@@ -37,3 +37,12 @@ test('invalid times, contradictory interests and malformed friend emails cannot 
     assert.equal(PreferencesSchema.safeParse({ ...base, ...patch }).success, false);
   }
 });
+
+test('custom Other answers are included in the agent input', () => {
+  const preferences = PreferencesSchema.parse({ ...defaultPreferences('Joao'), interests: ['Birdwatching'], dislikes: ['Crowds'], dietary: ['Nut allergy'], vibe: 'Quiet and spontaneous' });
+  const input = preferencesToInput(preferences, 'joao@example.com');
+  assert.deepEqual(input.interests, ['Birdwatching']);
+  assert.deepEqual(input.dislikes, ['Crowds']);
+  assert.deepEqual(input.dietary, ['Nut allergy']);
+  assert.match(input.vibe!, /Quiet and spontaneous/);
+});

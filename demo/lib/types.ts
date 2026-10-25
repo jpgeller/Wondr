@@ -48,6 +48,9 @@ export type Stop = {
   endsAt: string;
   description: string;
   sourceUrl?: string; // the search result the venue came from
+  googlePlaceId?: string;
+  travelFromPrevious?: { mode: 'walking' | 'driving'; minutes: number; distanceMiles: number }; // estimate, not live routing
+  admission?: { kind: 'free' | 'ticket' | 'pay_on_site'; priceUsd?: number; ticketUrl?: string };
   booking: StopBooking;
 };
 

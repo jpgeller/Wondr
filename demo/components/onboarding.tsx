@@ -10,10 +10,11 @@ const DIETARY = ['None', 'Vegetarian', 'Vegan', 'Gluten-free', 'Halal'];
 const ENERGY = ['Chill', 'Balanced', 'High energy'] as const;
 const VIBES = ['Adventurous', 'Cozy', 'Romantic', 'Social', 'Creative'] as const;
 
-function Pills({ label, items, selected, onToggle }: { label: string; items: readonly string[]; selected: string[]; onToggle: (item: string) => void }) {
+function Pills({ label, items, selected, onToggle, otherName }: { label: string; items: readonly string[]; selected: string[]; onToggle: (item: string) => void; otherName: string }) {
   return <fieldset className={styles.group}><legend className={styles.legend}>{label}</legend>
-    <div className={styles.pills}>{items.map((item) => <button key={item} type="button" className={styles.pill}
+    <div className={styles.pills}>{[...new Set([...items, ...selected])].map((item) => <button key={item} type="button" className={styles.pill}
       aria-pressed={selected.includes(item)} data-selected={selected.includes(item)} onClick={() => onToggle(item)}>{item}</button>)}</div>
+    <input className={`${styles.input} ${styles.otherInput}`} name={otherName} placeholder="Other" aria-label={`Other ${label.toLowerCase()}`} maxLength={100} />
   </fieldset>;
 }
 
@@ -62,6 +63,12 @@ export default function Onboarding({ initial, editing = false, onSave, onGenerat
     // Read native inputs from the form so date/time values always match the display.
     const data = new FormData(event.currentTarget);
     const next = { ...answers };
+    for (const field of ['interests', 'dislikes', 'dietary'] as const) {
+      const other = String(data.get(`${field}Other`) || '').trim();
+      if (other && !next[field].some((value) => value.toLowerCase() === other.toLowerCase())) next[field] = [...next[field], other];
+    }
+    const otherVibe = String(data.get('vibeOther') || '').trim();
+    if (otherVibe) next.vibe = otherVibe;
     if (step === 1) { next.name = String(data.get('name')).trim(); next.city = String(data.get('city')).trim(); }
     if (step === 4) {
       for (const key of ['date', 'windowStart', 'windowEnd', 'timezone'] as const) next[key] = String(data.get(key));
@@ -106,11 +113,11 @@ export default function Onboarding({ initial, editing = false, onSave, onGenerat
         <p className={styles.hint}>Tell us what fits today. Every new day starts with these questions.</p>
       </>}
       {step === 2 && <>
-        <Pills label="Love" items={[...new Set([...ACTIVITIES, ...answers.interests, ...answers.dislikes])]} selected={answers.interests} onToggle={(item) => toggleActivity(item, 'interests')} />
-        <Pills label="Hard pass" items={[...new Set([...ACTIVITIES, ...answers.interests, ...answers.dislikes])]} selected={answers.dislikes} onToggle={(item) => toggleActivity(item, 'dislikes')} />
+        <Pills label="Love" otherName="interestsOther" items={[...new Set([...ACTIVITIES, ...answers.interests, ...answers.dislikes])]} selected={answers.interests} onToggle={(item) => toggleActivity(item, 'interests')} />
+        <Pills label="Hard pass" otherName="dislikesOther" items={[...new Set([...ACTIVITIES, ...answers.interests, ...answers.dislikes])]} selected={answers.dislikes} onToggle={(item) => toggleActivity(item, 'dislikes')} />
       </>}
       {step === 3 && <>
-        <Pills label="Dietary" items={DIETARY} selected={answers.dietary.length ? answers.dietary : ['None']} onToggle={(item) => patch({ dietary: item === 'None' ? [] : answers.dietary.includes(item) ? answers.dietary.filter((d) => d !== item) : [...answers.dietary, item] })} />
+        <Pills label="Dietary" otherName="dietaryOther" items={DIETARY} selected={answers.dietary.length ? answers.dietary : ['None']} onToggle={(item) => patch({ dietary: item === 'None' ? [] : answers.dietary.includes(item) ? answers.dietary.filter((d) => d !== item) : [...answers.dietary, item] })} />
         <Slider id="budget" label="Budget per person" value={answers.budget} min={0} max={300} step={10} display={`$${answers.budget}`} onChange={(budget) => patch({ budget, budgetCap: budget })} />
         <Slider id="energy" label="Energy level" value={ENERGY.indexOf(answers.energy)} min={0} max={2} display={answers.energy} onChange={(energy) => patch({ energy: ENERGY[energy] })} />
         <Slider id="travel" label="Max travel" value={answers.travel} min={1} max={20} display={`${answers.travel} mi`} onChange={(travel) => patch({ travel })} />
@@ -122,7 +129,7 @@ export default function Onboarding({ initial, editing = false, onSave, onGenerat
         <div className={styles.group}><div className={styles.label}><label htmlFor="timezone">Local time zone</label></div><select className={styles.input} name="timezone" id="timezone" defaultValue={answers.timezone} onChange={(e) => patch({ timezone: e.target.value })}>
           {[...new Set([answers.timezone, 'America/Los_Angeles', 'America/Denver', 'America/Chicago', 'America/New_York', 'Europe/London', 'Europe/Lisbon', 'Europe/Copenhagen', Intl.DateTimeFormat().resolvedOptions().timeZone])].map((zone) => <option key={zone} value={zone}>{zone.replaceAll('_', ' ').replaceAll('/', ' / ')}</option>)}
         </select></div>
-        <Pills label="Vibe" items={VIBES} selected={[answers.vibe]} onToggle={(vibe) => patch({ vibe: vibe as Preferences['vibe'] })} />
+        <Pills label="Vibe" otherName="vibeOther" items={VIBES} selected={[answers.vibe]} onToggle={(vibe) => patch({ vibe })} />
         <div className={styles.group}><div className={styles.label}><label htmlFor="friend">Who’s coming</label></div>
           <div className={styles.friendRow}><input id="friend" className={styles.input} inputMode="email" autoComplete="off" placeholder="friend@email.com" value={friend} onChange={(e) => setFriend(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addFriend(); } }} /><button type="button" className={styles.add} onClick={addFriend}>Add</button></div>
           <div className={styles.friends}>{answers.friendEmails.map((email) => <button type="button" key={email} className={styles.pill} aria-label={`Remove ${email}`} onClick={() => patch({ friendEmails: answers.friendEmails.filter((f) => f !== email) })}>{email} ×</button>)}</div>

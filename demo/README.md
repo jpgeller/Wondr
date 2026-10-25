@@ -32,10 +32,27 @@ and converts these answers to the existing agent contract.
 
 The welcome and results pages use the supplied `public/brand/wondr-wander.png`
 artwork as a background. `components/day-timeline.tsx` shows only the saved stops,
-with venue details hidden until clicked. Demo mode allows revealing any stop early;
+with venue details hidden until clicked. Any stop can be revealed early;
 there is no second generation form or late/skip/swap control.
 `components/onboarding.module.css` contains the cream, navy, and orange design.
 The logo retains the supplied wordmark's shapes through an SVG mask.
+
+Likes, hard passes, dietary preferences, and vibe each accept an **Other** text
+answer. The reveal shows a short description, a linked address, and a Google
+Places photo when available. `POST /api/place-photo` keeps the Google key on the
+server, fetches fresh photo references, and returns author attribution. Production
+requires sign-in; the protected cloud preview can use the same endpoint.
+
+New plans may include `googlePlaceId`, `travelFromPrevious` (walking/driving,
+estimated minutes and miles), and `admission` (kind, optional verified price and
+ticket URL). Older plans still render. The agent must leave enough travel time
+between stops. Ticket receipts are visual prototypes, explicitly marked Preview;
+they do not call Stripe, purchase tickets, or change booking status. Restaurants
+never get the ticket treatment.
+
+For local visual review, open `/design-preview` while running `npm run dev`.
+It uses sample stops and live venue photos without generating an agent plan.
+This route returns 404 outside development. Use `/cloud-test` for a real run.
 
 ## What runs where
 

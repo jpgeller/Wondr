@@ -18,7 +18,7 @@ export const PreferencesSchema = z.object({
   timezone: z.string().max(100).refine((value) => {
     try { new Intl.DateTimeFormat('en', { timeZone: value }); return true; } catch { return false; }
   }),
-  vibe: z.enum(['Adventurous', 'Cozy', 'Romantic', 'Social', 'Creative']),
+  vibe: z.string().trim().min(1).max(100),
   budgetCap: z.number().int().min(0).max(300),
   friendEmails: z.array(z.email()).max(20),
 }).refine((p) => p.windowEnd > p.windowStart, 'Choose an end time later than the start.')
